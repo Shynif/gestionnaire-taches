@@ -34,11 +34,11 @@ def viz(T) :
 def liste_evt(T) :
     e=[]
     for i,t in enumerate(T) :
-        e.append((t[0],i,0))
-        e.append((t[1],i,1))
-    return e #sorted(e,key=lambda x:x[0])
+        e.append((t[0],i,0)) # Ajoute le début de la tâche
+        e.append((t[1],i,1)) # Ajoute la fin de la tâche
+    return e # Trié en tri fusion sinon -> sorted(e,key=lambda x:x[0])
 
-def fusion(T): # Stack-Reveret-Overflow
+def trier_evt(T): # Stack-Reveret-Overflow
     """
     trie la liste par la méthode de fusion 
     T (list)
@@ -47,8 +47,8 @@ def fusion(T): # Stack-Reveret-Overflow
     if longueur == 1:
         return T
     else:
-        debut = fusion(T[:longueur // 2])
-        fin = fusion(T[longueur // 2:])
+        debut = trier_evt(T[:longueur // 2])
+        fin = trier_evt(T[longueur // 2:])
 
         retour = []
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     T = n_taches(nb_taches)
     #T = [(5, 12), (13, 15), (0, 2), (1, 4), (3, 7), (10, 14), (8, 11), (6, 9)]
     E = liste_evt(T)
-    E = fusion(E)
+    E = trier_evt(E)
     #print("T=", T)
     #print("E=", E)
     simul=nb_simultanees(E) # Partie A
