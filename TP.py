@@ -64,24 +64,24 @@ def fusion(T): # Stack-Reveret-Overflow
 
     return retour
 
-def nb_simultanees(E) :
-    mm=0
-    m=0
-    for e in E :
-        m =m-1 if e[2] else m+1
-        mm=max(m,mm)
-    return mm
+def nb_simultanees(E : list) -> int :
+    maximum=0
+    enCoursMaximum=0
+    for element in E :
+        enCoursMaximum=enCoursMaximum-1 if element[2] else enCoursMaximum+1
+        maximum=max(enCoursMaximum,maximum)
+    return maximum
 
 def graphe_tache(T) :
     g=Graph_as_list()
     [g.ajouter_sommet(f'T{i}') for i in range(len(T))]
     for i in range(len(T)) :
         for j in range(i,len(T)) :
-            if (T[i][0]>T[j][0] and T[i][0]<T[j][1]) or (T[i][1]>T[j][0] and T[i][1]<T[j][1]) :
+            if (T[j][1]>T[i][0]>T[j][0]) or (T[i][1]>T[j][0]>T[i][0]) :
                 g.ajouter_arete(f'T{i}',f'T{j}')
     return g
 
-def solve(g,enCours,role) : # 1 à 1
+def solve(g,enCours,role) -> dict : # 1 à 1
     n=0
     for i in range(len(g.voisins(enCours))) : # 2 pas mal, 1 marche pas
         for s in g.voisins(enCours) :
@@ -90,8 +90,8 @@ def solve(g,enCours,role) : # 1 à 1
     role[enCours]=n
     return role
 
-def solve2(g,enCours,role) : # Largeur
-    f=[enCours] # File (sans File car trop lent)
+def solve2(g,enCours,role) -> dict : # Largeur
+    f=[enCours] # File (sans File car trop lent) mais sans deque (car trop la flemme)
     visite=[enCours]
     while f :
         tache=f.pop(0) # Defile
@@ -108,8 +108,8 @@ def solve2(g,enCours,role) : # Largeur
         role[tache]=n
     return role
 
-def solve3(g,enCours,role) : # Profondeur
-    p=[enCours] # Pile (sans Pile car trop lent)
+def solve3(g,enCours,role) -> dict : # Profondeur
+    p=[enCours] # Pile (sans Pile car trop lent) mais sans deque (car trop la flemme)
     visite=[enCours]
     while p :
         tache=p.pop() # Depile
@@ -126,33 +126,31 @@ def solve3(g,enCours,role) : # Profondeur
         role[tache]=n
     return role
 
-def taille_operation(taches) :
-    '''maxi=0
-    for v in taches.values() :
-        maxi=max(maxi,v)
-    return maxi'''
+
+def taille_repartition(taches : dict) -> int : # Retourne la plus grande valeur du dictionnaire des tâches
     return max(taches.values())
 
-def cracker(g,combinaisons) :
-    role={sommet:None for sommet in g.get_sommets()}
+
+def repartition(g, combinaisons : list) -> dict :
+    role ={sommet:None for sommet in g.get_sommets()}
     roleb={sommet:None for sommet in g.get_sommets()}
-    rolec={sommet:None for sommet in g.get_sommets()}    
+    rolec={sommet:None for sommet in g.get_sommets()}
     for depart in combinaisons :
-        role=solve2(g,depart,role)
-        roleb=solve(g,depart,roleb)
-        rolec=solve(g,depart,rolec)
-    i=min({0:taille_operation(role),1:taille_operation(roleb),2:taille_operation(rolec)})
+        role =  solve(g, depart,  role)
+        roleb= solve2(g, depart, roleb)
+        rolec= solve3(g, depart, rolec) # Notes : le désactiver donne le même résultat que dans le cour :)
+    i=min({0:taille_repartition(role),1:taille_repartition(roleb),2:taille_repartition(rolec)})
     return [role,roleb,rolec][i]
 
 
-def tacheComplet(g) :
+def repartition_optimale(g) -> dict :
     sommet=g.get_sommets()
     maxi=float('inf')
     meilleurCalcul=None
     allSommet=[combinaison for combinaison in itertools.permutations(sommet, len(sommet))] # imaginer ne pas connaître itertools par coeur :^)        
     for combinaison in allSommet :
-        resultat = cracker(g, combinaison)
-        m=taille_operation(resultat)
+        resultat = repartition(g, combinaison)
+        m=taille_repartition(resultat)
         if m<maxi :
             meilleurCalcul=resultat
             maxi=m
@@ -160,9 +158,9 @@ def tacheComplet(g) :
 
 
 if __name__ == "__main__":
-    nb_taches = 8
+    nb_taches = 5
     T = n_taches(nb_taches)
-    # T = [(5, 12), (13, 15), (0, 2), (1, 4), (3, 7), (10, 14), (8, 11), (6, 9)]
+    #T = [(5, 12), (13, 15), (0, 2), (1, 4), (3, 7), (10, 14), (8, 11), (6, 9)]
     E = liste_evt(T)
     E = fusion(E)
     #print("T=", T)
@@ -173,7 +171,7 @@ if __name__ == "__main__":
     [g.retirer_sommet(s) for s in g.get_sommets() if not g.voisins(s)] # Supprime les tâches sans voisins pouvant être effectués par l'ouvrier n°0
 
 
-    resultatFinal=tacheComplet(g)
+    resultatFinal=repartition_optimale(g)
 
 
     # Coloration dugraph selon le résultat
@@ -184,7 +182,7 @@ if __name__ == "__main__":
     
     # Dessin final et résultat
     g.dessiner()
-    #print(resultatFinal)
+    print(resultatFinal)
 
     # Visualisation des tâches
-    #viz(T)
+    viz(T)
