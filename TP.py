@@ -154,6 +154,18 @@ def repartition_optimale(g) -> dict :
         if m<maxi :
             meilleurCalcul=resultat
             maxi=m
+    '''
+    # Version plus simple,  ne donne pas la meilleure solution à tout les coups
+    allSommet = g.get_sommets()
+    for i in range(len(allSommet)) :
+        resultat = repartition(g, allSommet)
+        m=taille_repartition(resultat)
+        if m<maxi :
+            meilleurCalcul=resultat
+            maxi=m
+        allSommet.append(allSommet.pop()) # Chenille :)
+        #shuffle(allSommet) # Version aléatoire qui supprent souvent
+    '''
     return meilleurCalcul
 
 
