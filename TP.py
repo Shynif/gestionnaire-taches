@@ -21,7 +21,7 @@ def n_taches(nb_taches : int) -> list :
     return [tuple(sorted([instants[k], instants[k+1]])) for k in range(0, len(instants), 2)]
 
 
-def viz(T) :
+def viz(T) : # Visualisation des tâches T utilisant des rectangles de Matplotlib
     from matplotlib import pyplot as plt
     from matplotlib.patches import Rectangle
     for i,t in enumerate(T) :
@@ -68,25 +68,32 @@ def nb_simultanees(E : list) -> int :
     maximum=0
     enCoursMaximum=0
     for element in E :
+        # Ajoute ou enlève 1 à au maximum en cour selon si une tâche démarre ou finit
         enCoursMaximum=enCoursMaximum-1 if element[2] else enCoursMaximum+1
-        maximum=max(enCoursMaximum,maximum)
+        maximum=max(enCoursMaximum,maximum) # Ré-actualise le maximum
     return maximum
 
 def graphe_tache(T) :
+    # Crée une liste vide
     g=Graph_as_list()
     [g.ajouter_sommet(f'T{i}') for i in range(len(T))]
+    # Itère à travers tout les éléments
     for i in range(len(T)) :
         for j in range(i,len(T)) :
-            if (T[j][1]>T[i][0]>T[j][0]) or (T[i][1]>T[j][0]>T[i][0]) :
-                g.ajouter_arete(f'T{i}',f'T{j}')
+            if (T[j][1]>T[i][0]>T[j][0]) or (T[i][1]>T[j][0]>T[i][0]) : # Si les tâches sont en même temps
+                g.ajouter_arete(f'T{i}',f'T{j}')                        # Ajoute l'arrête
     return g
 
 def solve(g,enCours,role) -> dict : # 1 à 1
-    n=0
-    for i in range(len(g.voisins(enCours))) : # 2 pas mal, 1 marche pas
+    ###  Calcul classique pour obtenir le plus numéro de tâche possible
+    n=0 # Numéro basique
+    # Va à travers la liste de-nouveau pour réactualiser les valeurs et être sûr de ne pas avoir de nouvelle égalités
+    # Autre façon de le comprendre : On augmente de 1 en 1 donc on reactualise et augmente de 1 en 1 en cas de nouvelle égalité
+    for i in range(len(g.voisins(enCours))) :
+        # Itère à travers tout les voisins pour regarder si ils sont égaux
         for s in g.voisins(enCours) :
-            if role[s] is not None and n==role[s] :
-                n+=1
+            if role[s] is not None and n==role[s] : # Si un voisin à déjà le numéro
+                n+=1                                # Prend le numéro supérieur
     role[enCours]=n
     return role
 
@@ -99,9 +106,9 @@ def solve2(g,enCours,role) -> dict : # Largeur
             if voisin not in visite :
                 visite.append(voisin)
                 f.append(voisin) # Enfile
-        # Calcul
+        ###  Calcul classique de SOLVE()
         n=0
-        for i in g.voisins(tache) : # On augmente de 1 en 1 donc on reactualise et augmente de 1 en 1
+        for i in g.voisins(tache) :
             for v in g.voisins(tache) :
                 if role[v] is not None and n==role[v] :
                     n+=1
@@ -117,9 +124,9 @@ def solve3(g,enCours,role) -> dict : # Profondeur
             if voisin not in visite :
                 visite.append(voisin)
                 p.append(voisin) # Enpile
-        # Calcul
+        ###  Calcul classique de SOLVE()
         n=0
-        for i in g.voisins(tache) : # On augmente de 1 en 1 donc on reactualise et augmente de 1 en 1
+        for i in g.voisins(tache) :
             for v in g.voisins(tache) :
                 if role[v] is not None and n==role[v] :
                     n+=1
@@ -138,7 +145,7 @@ def repartition(g, combinaisons : list) -> dict :
     for depart in combinaisons :
         role =  solve(g, depart,  role)
         roleb= solve2(g, depart, roleb)
-        rolec= solve3(g, depart, rolec) # Notes : le désactiver donne le même résultat que dans le cour :)
+        rolec= solve3(g, depart, rolec) # Notes : le désactiver donne le même résultat que dans le cour pour l'exemple donné :)
     i=min({0:taille_repartition(role),1:taille_repartition(roleb),2:taille_repartition(rolec)})
     return [role,roleb,rolec][i]
 
@@ -147,6 +154,7 @@ def repartition_optimale(g) -> dict :
     sommet=g.get_sommets()
     maxi=float('inf')
     meilleurCalcul=None
+    # Crée TOUTES les permutations possibles des sommets, TRES gourmand
     allSommet=[combinaison for combinaison in itertools.permutations(sommet, len(sommet))] # imaginer ne pas connaître itertools par coeur :^)        
     for combinaison in allSommet :
         resultat = repartition(g, combinaison)
