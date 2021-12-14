@@ -140,14 +140,15 @@ def taille_repartition(taches : dict) -> int : # Retourne la plus grande valeur 
 
 def repartition(g, combinaisons : list) -> dict :
     role ={sommet:None for sommet in g.get_sommets()}
-    roleb={sommet:None for sommet in g.get_sommets()}
-    rolec={sommet:None for sommet in g.get_sommets()}
+    #roleb={sommet:None for sommet in g.get_sommets()}
+    #rolec={sommet:None for sommet in g.get_sommets()}
     for depart in combinaisons :
         role =  solve(g, depart,  role)
-        roleb= solve2(g, depart, roleb)
-        rolec= solve3(g, depart, rolec) # Notes : le désactiver donne le même résultat que dans le cour pour l'exemple donné :)
-    i=min({0:taille_repartition(role),1:taille_repartition(roleb),2:taille_repartition(rolec)})
-    return [role,roleb,rolec][i]
+        #roleb= solve2(g, depart, roleb)
+        #rolec= solve3(g, depart, rolec) # Notes : le désactiver donne le même résultat que dans le cour pour l'exemple donné :)
+    #i=min({0:taille_repartition(role),1:taille_repartition(roleb),2:taille_repartition(rolec)})
+    #return [role,roleb,rolec][i]
+    return role
 
 
 def repartition_optimale(g) -> dict :
