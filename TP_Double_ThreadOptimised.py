@@ -117,7 +117,7 @@ def subThreadMain() :
                 resultatFinal=pr[0]
 
 if __name__ == "__main__" :
-    nb_taches = 11
+    nb_taches = 10
     T = n_taches(nb_taches)
     #T = [(5, 12), (13, 15), (0, 2), (1, 4), (3, 7), (10, 14), (8, 11), (6, 9)]
     E = liste_evt(T)
